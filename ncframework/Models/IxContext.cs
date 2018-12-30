@@ -23,5 +23,20 @@ namespace ncframework.Models
 
         public DbSet<User> User { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Company>()
+                .HasIndex(p => new { p.Code })
+                .IsUnique(true);
+
+            modelBuilder.Entity<Employee>()
+               .HasIndex(p => new { p.Code })
+               .IsUnique(true);
+
+            modelBuilder.Entity<Employee>()
+               .HasIndex(p => new { p.Code })
+               .IsUnique(true);
+        }
+
     }
 }

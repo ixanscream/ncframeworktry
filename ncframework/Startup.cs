@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -32,8 +33,15 @@ namespace ncframework
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
             services.AddDbContext<IxContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
                 sqlServerOptions => sqlServerOptions.CommandTimeout(340).UseRowNumberForPaging()));
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.AccessDeniedPath = "/Account/Forbidden/";
+                options.LoginPath = "/Account/Login";
+            });
 
             services.AddPaging(options => {
                 options.ViewName = "Bootstrap4";
@@ -54,7 +62,7 @@ namespace ncframework
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
+            app.UseAuthentication();
             app.UseStaticFiles();
             app.UseCookiePolicy();
 

@@ -13,4 +13,9 @@
     <PackageReference Include="ReflectionIT.Mvc.Paging" Version="3.3.0" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\vis\" />
+  </ItemGroup>
+
 </Project>

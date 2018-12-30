@@ -23,6 +23,7 @@ namespace ncframework.Models
         public int Code { get; set; }
 
         [StringLength(50)]
+        [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
 
@@ -30,13 +31,28 @@ namespace ncframework.Models
         public string Photo { get; set; }
 
 
-        [StringLength(50)]
+        [StringLength(50), MinLength(8)]
         [Display(Name = "Phone")]
+        [DataType(DataType.PhoneNumber)]
         public string Phone { get; set; }
+
+        [ForeignKey("Company")]
+        [StringLength(36)]
+        public string CompanyId { get; set; }
+        public Company Company { get; set; }
 
         [ForeignKey("Parent")]
         [StringLength(36)]
         public string ParentId { get; set; }
         public Employee Parent { get; set; }
+
+        [ForeignKey("Group")]
+        [StringLength(36)]
+        public string GroupId { get; set; }
+        public Lookup Group { get; set; }
+
+        [Display(Name = "Role Group")]
+        [StringLength(370), MinLength(36)]
+        public string GroupMenu { get; set; }
     }
 }

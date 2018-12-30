@@ -20,6 +20,7 @@ namespace ncframework.Models
 
         [Required]
         [StringLength(50)]
+        [RegularExpression(@"^\S*$", ErrorMessage = "No white space allowed")]
 
         public string Code { get; set; }
 
@@ -27,5 +28,11 @@ namespace ncframework.Models
         [StringLength(36)]
         public string ParentId { get; set; }
         public Lookup Parent { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        [RegularExpression(@"^\S*$", ErrorMessage = "No white space allowed")]
+
+        public string Group { get; set; }
     }
 }

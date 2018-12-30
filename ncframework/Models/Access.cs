@@ -13,10 +13,10 @@ namespace ncframework.Models
         [StringLength(36)]
         public string Id { get; set; }
 
-        [ForeignKey("Lookup")]
+        [ForeignKey("Group")]
         [StringLength(36)]
-        public string LookupId { get; set; }
-        public Lookup Lookup { get; set; }
+        public string GroupId { get; set; }
+        public Lookup Group { get; set; }
 
         [ForeignKey("Menu")]
         [StringLength(36)]
