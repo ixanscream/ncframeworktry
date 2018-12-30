@@ -57,7 +57,6 @@ namespace ncframework.Controllers
                             IsAdmin = _user.IsAdmin.ToString(),
                             Name = _user.UserId,
                             Email = string.Empty,
-                            Company = string.Empty,
                             Roles = string.Empty,
                             MenuJson = string.Empty
                         };
@@ -70,18 +69,13 @@ namespace ncframework.Controllers
                             {
                                 user.Email = _employee.Email;
                                 user.Name = _employee.Name;
-                                user.Company = _employee.CompanyId;
-                                user.Roles = _employee.GroupMenu;
+                                user.Roles = string.IsNullOrEmpty(_employee.GroupMenu) ? string.Empty : _employee.GroupMenu;
                             }
 
                             string[] menuArray = _employee.GroupMenu.Split(",");
-                            var _access = await _context.Access.Include(o => o.Menu).Where(o => menuArray.Contains(o.GroupId)).ToListAsync();
-                            var _menu = new List<Menu>();
-
-                            foreach (var item in _access)
-                            {
-                                _menu.Add(item.Menu);
-                            }
+                            var _access = await _context.Access.Where(o => menuArray.Contains(o.Group.Code)).ToListAsync();
+                            string[] accessArray = _access.Select(o => o.MenuId).ToArray();
+                            var _menu = await _context.Menu.Where(o => accessArray.Contains(o.Id)).ToListAsync();
 
                             string _menuJson = JsonConvert.SerializeObject(_menu);
                             user.MenuJson = _menuJson;
@@ -97,7 +91,6 @@ namespace ncframework.Controllers
                         {
                             new Claim(ClaimTypes.NameIdentifier, user.Id),
                             new Claim(ClaimTypes.Name, user.Name),
-                            new Claim(ClaimTypes.PrimarySid, user.Company),
                             new Claim(ClaimTypes.Email, user.Email),
                             new Claim(ClaimTypes.Role, user.Roles),
                             new Claim(ClaimTypes.UserData, user.MenuJson)
@@ -106,9 +99,7 @@ namespace ncframework.Controllers
                         var identity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
                         var principal = new ClaimsPrincipal(identity);
                         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    }
-
-                 
+                    }              
 
                     //   await this.HubContext.Clients.All.SendAsync("Join", user.UserName);
 

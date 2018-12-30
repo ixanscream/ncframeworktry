@@ -7,8 +7,7 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-
+<h3>Index Menu</h3>
 
 <form role="search">
     <div class="form-group">
@@ -16,8 +15,8 @@
         <input type="text" class="form-control" placeholder="Search" name="filter" value="@Model.RouteValue["Filter"]">
 
     </div>
-    <button type="submit" class="btn btn-primary">Search</button>
-    <a asp-action="Create" class="btn btn-primary">Create</a>
+    <input type="submit" class="btn-link btn" value="Search">
+    <a asp-action="Create" class="btn-link btn">Create</a>
 </form>
 <hr />
 <nav aria-label="Page navigation">
@@ -27,13 +26,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.SortableHeaderFor(model => model.Name, this.Model)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Index)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Controller)
+                @Html.SortableHeaderFor(model => model.Controller, this.Model)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Action)
@@ -70,9 +69,9 @@
                     @Html.DisplayFor(modelItem => item.Parent.Name)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Edit"  asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Delete"   asp-route-id="@item.Id">Delete</a>
                 </td>
             </tr>
         }

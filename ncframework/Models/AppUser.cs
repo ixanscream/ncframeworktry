@@ -11,13 +11,11 @@ namespace ncframework.Models
 
         public string Id { get; set; }
         public string Name { get; set; }
-        public string Company { get; set; }
         public string Roles { get; set; }
         public string Email { get; set; }
         public string IsAdmin { get; set; }
         public string MenuJson { get; set; }
     }
-
 
     public class AppCurrentUser : ClaimsPrincipal
     {
@@ -41,14 +39,7 @@ namespace ncframework.Models
                 return this.FindFirst(ClaimTypes.Name).Value;
             }
         }
-
-        public string Company
-        {
-            get
-            {
-                return this.FindFirst(ClaimTypes.PrimarySid).Value;
-            }
-        }
+        
 
         public string Email
         {

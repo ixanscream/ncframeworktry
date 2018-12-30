@@ -6,7 +6,8 @@ var baseUrl = window.location.origin;
 
 var userLang = navigator.language || navigator.userLanguage;
 $(function () {
-   // $('select').select2();
+
+    $('select').select2();
 
     //$('input[type="submit"],#displayOverlay').on("click", function () {
     //    document.getElementById("overlay").style.display = "block";
@@ -15,7 +16,8 @@ $(function () {
 
     var container = "<div class='table-responsive'></div>";
     $("table").wrap(container);
-    $("table").addClass('table-hover  table-sm');
+    $("table").addClass('table-hover table-bordered table-sm');
+    
 
     //$('input[type=datetime],input[type=date]').datepicker({
     //    format: 'mm/dd/yyyy'

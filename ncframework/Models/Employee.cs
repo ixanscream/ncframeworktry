@@ -18,7 +18,6 @@ namespace ncframework.Models
         public string Name { get; set; }
 
         [Required]
-        [StringLength(50)]
         [Display(Name = "NIK")]
         public int Code { get; set; }
 
@@ -35,24 +34,22 @@ namespace ncframework.Models
         [Display(Name = "Phone")]
         [DataType(DataType.PhoneNumber)]
         public string Phone { get; set; }
-
-        [ForeignKey("Company")]
-        [StringLength(36)]
-        public string CompanyId { get; set; }
-        public Company Company { get; set; }
+        
 
         [ForeignKey("Parent")]
+        [Display(Name = "Report To")]
         [StringLength(36)]
         public string ParentId { get; set; }
         public Employee Parent { get; set; }
 
         [ForeignKey("Group")]
+        [Display(Name = "Position")]
         [StringLength(36)]
         public string GroupId { get; set; }
         public Lookup Group { get; set; }
 
         [Display(Name = "Role Group")]
-        [StringLength(370), MinLength(36)]
+        [StringLength(100)]
         public string GroupMenu { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace ncframework.Controllers
             {
                 _Menu = _Menu.Where(p => p.Name.Contains(filter));
             }
-            var _result = await PagingList<Menu>.CreateAsync(_Menu, 1, page, sortExpression, "Name");
+            var _result = await PagingList<Menu>.CreateAsync(_Menu, 20, page, sortExpression, sortExpression);
             _result.RouteValue = new RouteValueDictionary { { "filter", filter } };
 
             return View(_result);

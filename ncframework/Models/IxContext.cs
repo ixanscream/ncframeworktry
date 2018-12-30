@@ -13,8 +13,7 @@ namespace ncframework.Models
         { }
 
         public DbSet<Access> Access { get; set; }
-
-        public DbSet<Company> Company { get; set; }
+        
 
         public DbSet<Employee> Employee { get; set; }
 
@@ -25,17 +24,13 @@ namespace ncframework.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Company>()
-                .HasIndex(p => new { p.Code })
-                .IsUnique(true);
-
             modelBuilder.Entity<Employee>()
                .HasIndex(p => new { p.Code })
                .IsUnique(true);
 
-            modelBuilder.Entity<Employee>()
-               .HasIndex(p => new { p.Code })
-               .IsUnique(true);
+            modelBuilder.Entity<Lookup>()
+              .HasIndex(p => new { p.Code })
+              .IsUnique(true);
         }
 
     }

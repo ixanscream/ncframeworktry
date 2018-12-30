@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using ncframework.Models;
+using ReflectionIT.Mvc.Paging;
 
 namespace ncframework.Controllers
 {
@@ -19,10 +21,17 @@ namespace ncframework.Controllers
         }
 
         // GET: Lookups
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "Group")
         {
-            var ixContext = _context.Lookup.Include(l => l.Parent);
-            return View(await ixContext.ToListAsync());
+            var _Lookup = _context.Lookup.Include(o => o.Parent).AsNoTracking().OrderBy(x => x.Group).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                _Lookup = _Lookup.Where(p => p.Name.Contains(filter));
+            }
+            var _result = await PagingList<Lookup>.CreateAsync(_Lookup, 20, page, sortExpression, sortExpression);
+            _result.RouteValue = new RouteValueDictionary { { "filter", filter } };
+
+            return View(_result);
         }
 
         // GET: Lookups/Details/5

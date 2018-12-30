@@ -39,50 +39,13 @@ namespace ncframework.Migrations
                     b.ToTable("Access");
                 });
 
-            modelBuilder.Entity("ncframework.Models.Company", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(36);
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("ContactName")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("ContactPhone")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50);
-
-                    b.Property<string>("ParentId")
-                        .HasMaxLength(36);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.HasIndex("ParentId");
-
-                    b.ToTable("Company");
-                });
-
             modelBuilder.Entity("ncframework.Models.Employee", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(36);
 
-                    b.Property<int>("Code")
-                        .HasMaxLength(50);
-
-                    b.Property<string>("CompanyId")
-                        .HasMaxLength(36);
+                    b.Property<int>("Code");
 
                     b.Property<string>("Email")
                         .HasMaxLength(50);
@@ -91,7 +54,7 @@ namespace ncframework.Migrations
                         .HasMaxLength(36);
 
                     b.Property<string>("GroupMenu")
-                        .HasMaxLength(370);
+                        .HasMaxLength(100);
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -110,8 +73,6 @@ namespace ncframework.Migrations
 
                     b.HasIndex("Code")
                         .IsUnique();
-
-                    b.HasIndex("CompanyId");
 
                     b.HasIndex("GroupId");
 
@@ -143,6 +104,9 @@ namespace ncframework.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Code")
+                        .IsUnique();
+
                     b.HasIndex("ParentId");
 
                     b.ToTable("Lookup");
@@ -163,8 +127,7 @@ namespace ncframework.Migrations
                     b.Property<string>("Icon")
                         .HasMaxLength(50);
 
-                    b.Property<int>("Index")
-                        .HasMaxLength(50);
+                    b.Property<int>("Index");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -192,6 +155,7 @@ namespace ncframework.Migrations
                     b.Property<bool>("IsAdmin");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasMaxLength(36);
 
                     b.HasKey("UserId");
@@ -212,19 +176,8 @@ namespace ncframework.Migrations
                         .HasForeignKey("MenuId");
                 });
 
-            modelBuilder.Entity("ncframework.Models.Company", b =>
-                {
-                    b.HasOne("ncframework.Models.Company", "Parent")
-                        .WithMany()
-                        .HasForeignKey("ParentId");
-                });
-
             modelBuilder.Entity("ncframework.Models.Employee", b =>
                 {
-                    b.HasOne("ncframework.Models.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId");
-
                     b.HasOne("ncframework.Models.Lookup", "Group")
                         .WithMany()
                         .HasForeignKey("GroupId");

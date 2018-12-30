@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using ncframework.Models;
+using ReflectionIT.Mvc.Paging;
 
 namespace ncframework.Controllers
 {
@@ -19,10 +21,17 @@ namespace ncframework.Controllers
         }
 
         // GET: Accesses
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "Group.Name")
         {
-            var ixContext = _context.Access.Include(a => a.Group).Include(a => a.Menu);
-            return View(await ixContext.ToListAsync());
+            var _Access = _context.Access.Include(o => o.Group).Include(a => a.Menu).AsNoTracking().OrderBy(x => x.Group.Name).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                _Access = _Access.Where(p => p.Group.Name.Contains(filter));
+            }
+            var _result = await PagingList<Access>.CreateAsync(_Access, 20, page, sortExpression, sortExpression);
+            _result.RouteValue = new RouteValueDictionary { { "filter", filter } };
+
+            return View(_result);
         }
 
         // GET: Accesses/Details/5
@@ -48,8 +57,8 @@ namespace ncframework.Controllers
         // GET: Accesses/Create
         public IActionResult Create()
         {
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id");
-            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Id");
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Id", "Name");
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name");
             return View();
         }
 
@@ -66,8 +75,8 @@ namespace ncframework.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", access.GroupId);
-            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Id", access.MenuId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Id", "Name", access.GroupId);
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name", access.MenuId);
             return View(access);
         }
 
@@ -84,8 +93,8 @@ namespace ncframework.Controllers
             {
                 return NotFound();
             }
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", access.GroupId);
-            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Id", access.MenuId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Id", "Name", access.GroupId);
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name", access.MenuId);
             return View(access);
         }
 
@@ -121,8 +130,8 @@ namespace ncframework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", access.GroupId);
-            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Id", access.MenuId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Id", "Name", access.GroupId);
+            ViewData["MenuId"] = new SelectList(_context.Menu, "Id", "Name", access.MenuId);
             return View(access);
         }
 

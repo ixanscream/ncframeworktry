@@ -17,7 +17,6 @@ namespace ncframework.Models
 
         public string Name { get; set; }
         [Required]
-        [StringLength(50)]
         public int Index { get; set; }
 
         public string Controller { get; set; }

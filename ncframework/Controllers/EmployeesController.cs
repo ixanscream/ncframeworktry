@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using ncframework.Models;
+using ReflectionIT.Mvc.Paging;
 
 namespace ncframework.Controllers
 {
@@ -19,10 +21,17 @@ namespace ncframework.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "Group.Name")
         {
-            var ixContext = _context.Employee.Include(e => e.Company).Include(e => e.Group).Include(e => e.Parent);
-            return View(await ixContext.ToListAsync());
+            var _Employee = _context.Employee.Include(o => o.Group).Include(a => a.Group).AsNoTracking().OrderBy(x => x.Group.Name).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                _Employee = _Employee.Where(p => p.Group.Name.Contains(filter));
+            }
+            var _result = await PagingList<Employee>.CreateAsync(_Employee, 20, page, sortExpression, sortExpression);
+            _result.RouteValue = new RouteValueDictionary { { "filter", filter } };
+
+            return View(_result);
         }
 
         // GET: Employees/Details/5
@@ -34,7 +43,6 @@ namespace ncframework.Controllers
             }
 
             var employee = await _context.Employee
-                .Include(e => e.Company)
                 .Include(e => e.Group)
                 .Include(e => e.Parent)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -49,9 +57,9 @@ namespace ncframework.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Company, "Id", "Id");
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id");
-            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Id");
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name");
+            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Name");
+            ViewData["GroupMenu"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Code", "Code");
             return View();
         }
 
@@ -60,17 +68,18 @@ namespace ncframework.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Code,Email,Photo,Phone,CompanyId,ParentId,GroupId,GroupMenu")] Employee employee)
+        public async Task<IActionResult> Create([Bind("Id,Name,Code,Email,Photo,Phone,ParentId,GroupId,GroupMenu")] Employee employee, string[] roles)
         {
             if (ModelState.IsValid)
             {
+                employee.GroupMenu = string.Join(",", roles);
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Company, "Id", "Id", employee.CompanyId);
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", employee.GroupId);
-            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Id", employee.ParentId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name", employee.GroupId);
+            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Name", employee.ParentId);
+            ViewData["GroupMenu"] = new MultiSelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Code", "Code", employee.GroupMenu);
             return View(employee);
         }
 
@@ -87,9 +96,9 @@ namespace ncframework.Controllers
             {
                 return NotFound();
             }
-            ViewData["CompanyId"] = new SelectList(_context.Company, "Id", "Id", employee.CompanyId);
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", employee.GroupId);
-            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Id", employee.ParentId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name", employee.GroupId);
+            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Name", employee.ParentId);
+            ViewData["GroupMenu"] = new MultiSelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Code", "Code", employee.GroupMenu.Split(","));
             return View(employee);
         }
 
@@ -98,7 +107,7 @@ namespace ncframework.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Code,Email,Photo,Phone,CompanyId,ParentId,GroupId,GroupMenu")] Employee employee)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Code,Email,Photo,Phone,ParentId,GroupId,GroupMenu")] Employee employee, string[] roles)
         {
             if (id != employee.Id)
             {
@@ -109,6 +118,7 @@ namespace ncframework.Controllers
             {
                 try
                 {
+                    employee.GroupMenu = string.Join(",", roles);
                     _context.Update(employee);
                     await _context.SaveChangesAsync();
                 }
@@ -125,9 +135,9 @@ namespace ncframework.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Company, "Id", "Id", employee.CompanyId);
-            ViewData["GroupId"] = new SelectList(_context.Lookup, "Id", "Id", employee.GroupId);
-            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Id", employee.ParentId);
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name", employee.GroupId);
+            ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Name", employee.ParentId);
+            ViewData["GroupMenu"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Code", "Code", employee.GroupMenu);
             return View(employee);
         }
 
@@ -140,7 +150,6 @@ namespace ncframework.Controllers
             }
 
             var employee = await _context.Employee
-                .Include(e => e.Company)
                 .Include(e => e.Group)
                 .Include(e => e.Parent)
                 .FirstOrDefaultAsync(m => m.Id == id);
