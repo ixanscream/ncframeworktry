@@ -4,34 +4,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using ncframework.Models;
-using ReflectionIT.Mvc.Paging;
 
 namespace ncframework.Controllers
 {
-    public class EmployeesController : Controller
+    public class EmployeesPartialController : Controller
     {
         private readonly IxContext _context;
 
-        public EmployeesController(IxContext context)
+        public EmployeesPartialController(IxContext context)
         {
             _context = context;
         }
 
-        // GET: Employees
-        public async Task<IActionResult> Index(string filter, int page = 1, string sortExpression = "Group.Name")
+        // GET: EmployeesPartial
+        public async Task<IActionResult> Index(string id)
         {
-            var _Employee = _context.Employee.Include(o => o.Group).Include(a => a.Group).Include(a => a.Parent).AsNoTracking().OrderBy(x => x.Group.Name).AsQueryable();
-            if (!string.IsNullOrWhiteSpace(filter))
-            {
-                _Employee = _Employee.Where(p => p.Group.Name.Contains(filter));
-            }
-            var _result = await PagingList<Employee>.CreateAsync(_Employee, 20, page, sortExpression, sortExpression);
-            _result.RouteValue = new RouteValueDictionary { { "filter", filter } };
-
-            return View(_result);
+            var ixContext = _context.Employee.Where(o => o.GroupId == id).Include(e => e.Group).Include(e => e.Parent);
+            ViewData["_id"] = id;
+            return View(await ixContext.ToListAsync());
         }
 
         // GET: Employees/Details/5
@@ -55,9 +47,9 @@ namespace ncframework.Controllers
         }
 
         // GET: Employees/Create
-        public IActionResult Create()
+        public IActionResult Create(string id)
         {
-            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name");
+            ViewData["GroupId"] = new SelectList(_context.Lookup.Where(o => o.Group == "ORG"), "Id", "Name", id);
             ViewData["ParentId"] = new SelectList(_context.Employee, "Id", "Name");
             ViewData["GroupMenu"] = new SelectList(_context.Lookup.Where(o => o.Group == "ROLE"), "Code", "Code");
             return View();

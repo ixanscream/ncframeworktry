@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_PartialLayout.cshtml";
 }
 
 <h1>Create</h1>
@@ -69,6 +69,7 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
 
     <script type="text/javascript">
         $(function () {
